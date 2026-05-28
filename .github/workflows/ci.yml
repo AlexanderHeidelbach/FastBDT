@@ -33,7 +33,8 @@ jobs:
           cmake -S . -B build \
             -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install \
             -DUSE_DOUBLE_WEIGHT=${{ env.CMAKE_USE_DOUBLE_WEIGHT }} \
-            -DCMAKE_PREFIX_PATH=$(brew --prefix)
+            -DCMAKE_PREFIX_PATH=$(brew --prefix) \
+            -DPYTHON=$(which python3)
 
       - name: Build
         run: make -C build -j$(sysctl -n hw.ncpu)
@@ -42,7 +43,8 @@ jobs:
         run: |
           source venv/bin/activate
           make -C build install
-          python3 -c "import PyFastBDT; print('PyFastBDT version:', PyFastBDT.__version__)"
+          # Run from /tmp so Python cannot accidentally import from the source tree
+          cd /tmp && python3 -c "import PyFastBDT; print('PyFastBDT version:', PyFastBDT.__version__)"
 
       - name: Run unit tests
         run: |
