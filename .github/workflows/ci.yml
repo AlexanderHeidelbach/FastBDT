@@ -66,5 +66,4 @@ jobs:
           cd examples
           ls
           cat 
-          python3 iris_example.py iris.csv
           python3 generic_example.py
