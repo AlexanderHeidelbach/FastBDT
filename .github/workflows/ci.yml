@@ -46,19 +46,19 @@ jobs:
           # Run from /tmp so Python cannot accidentally import from the source tree
           cd /tmp && python3 -c "import PyFastBDT; print('PyFastBDT version:', PyFastBDT.__version__)"
 
-      # - name: Run unit tests
-      #   run: |
-      #     export DYLD_LIBRARY_PATH=${{ github.workspace }}/install/lib:$(brew --prefix)/lib
-      #     ${{ github.workspace }}/install/bin/fastbdt-unittests
+      - name: Run unit tests
+        run: |
+          export DYLD_LIBRARY_PATH=${{ github.workspace }}/install/lib:$(brew --prefix)/lib
+          ${{ github.workspace }}/install/bin/fastbdt-unittests
 
-      # - name: Run C++ example
-      #   run: |
-      #     cd examples
-      #     $CXX IRISExample.cxx -o IRISExample -O3 \
-      #       -lFastBDT_static \
-      #       -L ${{ github.workspace }}/install/lib \
-      #       -I ${{ github.workspace }}/install/include
-      #     ./IRISExample iris.csv
+      - name: Run C++ example
+        run: |
+          cd examples
+          $CXX IRISExample.cxx -o IRISExample -O3 \
+            -lFastBDT_static \
+            -L ${{ github.workspace }}/install/lib \
+            -I ${{ github.workspace }}/install/include
+          ./IRISExample iris.csv
 
       - name: Run Python examples
         run: |
@@ -66,4 +66,5 @@ jobs:
           cd examples
           ls
           cat 
+          python3 iris_example.py iris.csv
           python3 generic_example.py
