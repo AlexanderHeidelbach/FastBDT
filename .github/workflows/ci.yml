@@ -18,15 +18,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: brew install cmake
-
-      - name: Build and install GoogleTest
-        run: |
-          git clone --branch release-1.12.0 --depth 1 https://github.com/google/googletest.git /tmp/googletest
-          cmake -S /tmp/googletest -B /tmp/googletest/build \
-            -DBUILD_SHARED_LIBS=ON \
-            -DCMAKE_INSTALL_PREFIX=/usr/local
-          make -C /tmp/googletest/build -j$(sysctl -n hw.ncpu) install
+        run: brew install cmake googletest
 
       - name: Set up Python venv
         run: |
@@ -40,7 +32,8 @@ jobs:
           source venv/bin/activate
           cmake -S . -B build \
             -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}/install \
-            -DUSE_DOUBLE_WEIGHT=${{ env.CMAKE_USE_DOUBLE_WEIGHT }}
+            -DUSE_DOUBLE_WEIGHT=${{ env.CMAKE_USE_DOUBLE_WEIGHT }} \
+            -DCMAKE_PREFIX_PATH=$(brew --prefix)
 
       - name: Build
         run: make -C build -j$(sysctl -n hw.ncpu)
@@ -52,9 +45,9 @@ jobs:
           python3 -c "import PyFastBDT; print('PyFastBDT version:', PyFastBDT.__version__)"
 
       - name: Run unit tests
-        env:
-          DYLD_LIBRARY_PATH: ${{ github.workspace }}/install/lib:/usr/local/lib
-        run: ${{ github.workspace }}/install/bin/fastbdt-unittests
+        run: |
+          export DYLD_LIBRARY_PATH=${{ github.workspace }}/install/lib:$(brew --prefix)/lib
+          ${{ github.workspace }}/install/bin/fastbdt-unittests
 
       - name: Run C++ example
         run: |
